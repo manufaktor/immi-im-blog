@@ -1,17 +1,21 @@
 # Using UUIDs in SQLite
 
-I recently had the idea to shard some data over multiple SQLite databases, but still run analytical queries accross all databases. To do that, I need to merge some tables in one big database, which is easy enough when all databases share the same schema. However, having serial, autoincrementing primary keys would lead to conflicts when merging the data. A bit of an annoyance.
+SQLite does not support UUID's by default, but with a bit of tweaking it is certainly possible. I'll explain how to bring UUIDs to SQLite and how to use them as as primary keys for a table - with all the small steps it took me to get there.
 
-## UUID to the rescue
+## Why use UUIDs?
 
-Using UUID primary keys can help, they are unique accross all databases. They take a bit more space than just integers, but this doesn't concern us yet. Unfortunately, SQLite doesn't support UUID's out of the box, but I found a notable entry in the changelog:
+I recently had the idea to shard some data over multiple SQLite databases, but still run analytical queries accross all databases. As an example, think one database per customer, but one big offline database to figure out how many blog posts were written per user. To do that, I need to merge some tables in one big database, which is easy enough when all databases share the same schema. However, having autoincrementing integer primary keys would lead to conflicts when merging the data, since each database would have the same incrementing IDs. A bit of an annoyance.
+
+Using UUID primary keys could help, because they are unique accross all databases. They take a bit more space than just integers, but this doesn't concern us now.
+
+## Getting started (on Mac OS)
+
+While researching the topic, I discovered this entry in the SQLite changelog:
 
 ```txt
 2020-01-22 (3.31.0):
 - Added the uuid.c extension module implementing functions for processing RFC-4122 UUIDs.
 ```
-
-## Testing it on Mac OS
 
 The [extension](https://sqlite.org/src/file/ext/misc/uuid.c) mentions a `uuid()` function in SQLite. But because the pre-installed version of SQLite on Mac OS is pretty outdated, we first need to install a more current version.
 
@@ -61,27 +65,27 @@ sqlite> select uuid();
 615b71a4-8109-435e-b7fe-5f9be6a77b49
 ```
 
-Nice, we've accomplished something! Now we can start using `uuid()` during our open SQLite session. This is not a permanent install of the extension, though. The next time you open the sqlite shell, you need to run `.load uuid` again.
+Nice, we've accomplished something! Now we can start using `uuid()` during our open SQLite session. This is not a permanent install of the extension, though. The next time you open the sqlite shell, you need to run `.load ./uuid` again.
 
 The same thing applies when connecting to SQLite from an application, say, in Ruby, but I'll leave the details for another blog post.
 
-## Using a UUID as primary key
+## Creating UUID primary keys
 
-Unlike in Postgres, we don't really have a `uuid` datatype. What we have is a function to generate a version 4 UUID as a string. We can either store it as string, or as blob. The later will use only 16-bytes per UUID and save some space in the long run, the former is a bit easier to work with.
+Unlike in Postgres, we don't really have a `uuid` datatype. What we have now is a function to generate a version 4 UUID as a string (technically you also need to load an extension, `uuid-ossp` in Postgres to have functions to generate them). We can either store them as strings or blobs. The later will use only 16-bytes per UUID and save some space in the long run, the former is a bit easier to work with.
 
 ```sql
 select uuid_blob(uuid());
-> n??KB?E?? ??I? /* This is the binary UUID */
+/* > n??KB?E?? ??I? # This is the binary UUID */
 ```
 
-And of course we can also convert the blob back using `uuid_str()`, since readability is a bit challenged when printing binary.
+And of course we can also convert the binary UUID back using `uuid_str()`, since readability is a bit challenged when printing binary.
 
 ```sql
 select uuid_str(uuid_blob(uuid()));
-> 43c734ce-c533-4e9e-acce-367735915e86 /* 'tis a string now */
+/* > 43c734ce-c533-4e9e-acce-367735915e86 # 'tis a string now  */
 ```
 
-Finally, let's create a table using `uuid()` as a primary key and see if we can insert some records:
+Finally, let's create a table using `uuid()` for the primary key and see if we can insert some records:
 
 ```sql
 create table posts(
