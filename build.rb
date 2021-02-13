@@ -12,6 +12,7 @@ def convert_markdown_to_html_files
       input: 'GFM',
       syntax_highlighter: 'rouge',
       syntax_highlighter_opts: {},
+      template: 'layout.erb'
     ).to_html
 
     html_filename = "./public/#{File.basename(file,'.*')}.html"
