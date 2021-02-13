@@ -28,5 +28,21 @@ def log(*args)
   puts args.join(" ")
 end
 
+if ARGV.include?('-w')
+  require 'webrick'
 
-convert_markdown_to_html_files
+  root = File.expand_path './public'
+  request_callback = Proc.new do |req, res|
+    convert_markdown_to_html_files
+  end
+
+  server = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => root, :RequestCallback => request_callback)
+
+  trap 'INT' do
+    server.shutdown
+  end
+
+  server.start
+else
+  convert_markdown_to_html_files
+end
