@@ -1,12 +1,12 @@
 # Using UUIDs in SQLite
 
-SQLite does not support UUID's by default, but with a bit of tweaking it is certainly possible. I'll explain how to bring UUIDs to SQLite and how to use them as as primary keys for a table - with all the small steps it took me to get there.
+SQLite does not support UUIDs by default, but with a bit of tweaking it is certainly possible. I'll explain how to bring UUIDs to SQLite and how to use them as primary keys for a table - with all the small steps it took me to get there.
 
 ## Why use UUIDs?
 
-I recently had the idea to shard some data over multiple SQLite databases, but still run analytical queries accross all databases. As an example, think one database per customer, but one big offline database to figure out how many blog posts were written per user. To do that, I need to merge some tables in one big database, which is easy enough when all databases share the same schema. However, having autoincrementing integer primary keys would lead to conflicts when merging the data, since each database would have the same incrementing IDs. A bit of an annoyance.
+I recently had the idea to shard some data over multiple SQLite databases, but still wanted to run analytical queries across all databases. As an example, think of one database per customer, but one big offline database to figure out how many blog posts were written per user over all customers. To do that, I need to merge certain tables, which is easy enough when all databases share the same schema. However, having auto incrementing integer primary keys would lead to conflicts, because each database would have the same incrementing IDs. A bit of an annoyance.
 
-Using UUID primary keys could help, because they are unique accross all databases. They take a bit more space than just integers, but this doesn't concern us now.
+Using UUID primary keys could help, because they are unique across all databases. They take a bit more space than just integers, but this doesn't concern us now.
 
 ## Getting started (on Mac OS)
 
@@ -23,7 +23,7 @@ The [extension](https://sqlite.org/src/file/ext/misc/uuid.c) mentions a `uuid()`
 brew install sqlite
 ```
 
-Homebrew recognizes that SQLite is already preinstalled and doesn't override the existing sqlite3 binary. Instead, you'll have to call it by it's real name:
+Homebrew recognizes that SQLite is already pre-installed and doesn't override the existing sqlite3 binary. Instead, you'll have to call it by it's "real" name:
 
 ```sh
 $ /usr/local/opt/sqlite3/bin/sqlite3 # You can figure out this path via `brew info sqlite`
@@ -48,14 +48,14 @@ sqlite > select uuid(); # Error: no such function: uuid
 
 This doesn't work, because 3.31.0 just includes the source for the UUID extension, but it's not part of any build. So let's change this by getting the [source code](https://sqlite.org/src/file/ext/misc/uuid.c) first.
 
-Once we've downloaded the source file, we need to compile the extension, using `gcc`:
+Once we've downloaded the source file, [we need to compile the extension](https://sqlite.org/loadext.html), using `gcc`:
 
 ```sh
 # passing my brew-installed version of sqlite to be included in the search path
 gcc -g -fPIC -I /usr/local/opt/sqlite/include -dynamiclib uuid.c -o uuid.dylib
 ```
 
-Now we should have a compiled the `uuid.dylib` extension, which we can load into SQLite:
+Now we should have a compiled `uuid.dylib` extension, which we can load into SQLite:
 
 ```sh
 $ /usr/local/opt/sqlite3/bin/sqlite3
@@ -65,13 +65,13 @@ sqlite> select uuid();
 615b71a4-8109-435e-b7fe-5f9be6a77b49
 ```
 
-Nice, we've accomplished something! Now we can start using `uuid()` during our open SQLite session. This is not a permanent install of the extension, though. The next time you open the sqlite shell, you need to run `.load ./uuid` again.
+Nice, we've accomplished something! Now we can start using `uuid()` during our open SQLite session. **This is not a permanent install of the extension, though.** The next time you open the sqlite shell, you need to run `.load ./uuid` again.
 
-The same thing applies when connecting to SQLite from an application, say, in Ruby, but I'll leave the details for another blog post.
+The same thing applies when connecting to SQLite from an application, for example in Ruby, but I'll leave the details for another time.
 
 ## Creating UUID primary keys
 
-Unlike in Postgres, we don't really have a `uuid` datatype. What we have now is a function to generate a version 4 UUID as a string (technically you also need to load an extension, `uuid-ossp` in Postgres to have functions to generate them). We can either store them as strings or blobs. The later will use only 16-bytes per UUID and save some space in the long run, the former is a bit easier to work with.
+Unlike in Postgres, we don't really have a `uuid` data type. What we get is a function to generate a version 4 UUID as a string (technically you also need to load an extension, `uuid-ossp` in Postgres to have functions to generate them). We can either store them as strings or blobs. The latter will use only 16-bytes per UUID and save some space in the long run, the former is a bit easier to work with.
 
 ```sql
 select uuid_blob(uuid());
@@ -101,4 +101,10 @@ select uuid_str(id), body from posts;
 > 7da0322e-12f5-453f-8695-85e00bafc590|I am blog
 ```
 
-Having to use `uuid_str()` when reading back the binary uuid is a bit annoying, so I might just use strings for ease of use. Apart from that, nice! We have successfully employed UUID primary keys in SQLite.
+Having to use `uuid_str()` when reading back the binary UUID is a bit annoying, so I might just use strings for ease of use.
+
+Apart from that, nice! We have successfully employed UUID primary keys in SQLite. We also know how to build a runtime loadable extension using a custom install of SQLite on Mac OS. SQLite is a powerful tool that can be extended and made even more powerful. If you want to learn more, I suggest you visit the [official site](https://www.sqlite.org/loadext.html) and dive in!
+
+_Thank you [Tuğçe / @nuritnt](https://twitter.com/nuritnt/) for reviewing this text!_
+
+_Feb. 2021_

@@ -29,6 +29,14 @@ article {
   margin-bottom: 6vh;
 }
 
+strong {
+  font-weight: 500;
+}
+
+em {
+  color: #666;
+}
+
 h1 {
   font-size: 1.75rem;
   font-weight: 400;
