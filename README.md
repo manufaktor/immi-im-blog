@@ -1,2 +1,2 @@
-# manufaktor.github.io
+# immi.im
 My blog at immi.im
