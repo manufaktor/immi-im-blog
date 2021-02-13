@@ -1,5 +1,5 @@
 pre code {
-  background: #181818;
+  background: #2d2d2d;
   padding: 1rem;
   color: #f8f8f8;
   font-family: Consolas, Monaco, "Lucida Console";
@@ -12,7 +12,7 @@ pre code .hll {
   background-color: #ffffcc;
 }
 pre code .c {
-  color: #948498;
+  color: #ab9dad;
   font-style: italic;
 } /* Comment */
 pre code .err {
@@ -22,18 +22,18 @@ pre code .k {
   color: #cda869;
 } /* Keyword */
 pre code .cm {
-  color: #948498;
+  color: #ab9dad;
   font-style: italic;
 } /* Comment.Multiline */
 pre code .cp {
-  color: #948498;
+  color: #ab9dad;
 } /* Comment.Preproc */
 pre code .c1 {
-  color: #948498;
+  color: #ab9dad;
   font-style: italic;
 } /* Comment.Single */
 pre code .cs {
-  color: #948498;
+  color: #ab9dad;
   font-style: italic;
 } /* Comment.Special */
 pre code .gd {
@@ -127,16 +127,16 @@ pre code .w {
   color: #141414;
 } /* Text.Whitespace */
 pre code .mf {
-  color: #cf6a4c;
+  color: #ee957b;
 } /* Literal.Number.Float */
 pre code .mh {
-  color: #cf6a4c;
+  color: #ee957b;
 } /* Literal.Number.Hex */
 pre code .mi {
-  color: #cf6a4c;
+  color: #ee957b;
 } /* Literal.Number.Integer */
 pre code .mo {
-  color: #cf6a4c;
+  color: #ee957b;
 } /* Literal.Number.Oct */
 pre code .sb {
   color: #8f9d6a;
@@ -172,7 +172,7 @@ pre code .s1 {
   color: #8f9d6a;
 } /* Literal.String.Single */
 pre code .ss {
-  color: #cf6a4c;
+  color: #ee957b;
 } /* Literal.String.Symbol */
 pre code .bp {
   color: #00aaaa;
