@@ -1,3 +1,16 @@
+<%
+extend ::Kramdown::Utils::Html
+title = ''
+description = ''
+h = @converter.root.children.find {|c| c.type == :header}
+p = @converter.root.children.find {|c| c.type == :p}
+
+collector = lambda {|c| c.children.collect {|cc| cc.type == :text ? escape_html(cc.value, :text) : collector.call(cc)}.join('')}
+
+title = collector.call(h) if h
+description = collector.call(p) if p
+
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,15 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./twilight_pygments.css">
-<%
-extend ::Kramdown::Utils::Html
-title = ''
-h = @converter.root.children.find {|c| c.type == :header}
-if h
-  collector = lambda {|c| c.children.collect {|cc| cc.type == :text ? escape_html(cc.value, :text) : collector.call(cc)}.join('')}
-  title = collector.call(h)
-end
-%>
+  <meta name="description" content="<%= description %>">
   <title><%= title %></title>
 </head>
 <body>
