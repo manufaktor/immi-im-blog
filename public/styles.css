@@ -40,7 +40,7 @@ em {
 h1 {
   font-size: 1.75rem;
   font-weight: 400;
-  color: #255f98;
+  color: #206461;
   margin: 1em 0 0.65em 0;
 }
 
@@ -48,6 +48,18 @@ h2 {
   font-size: 1.15rem;
   font-weight: 400;
   margin: 2em 0 0.65em 0;
+}
+
+a:link {
+  color: #206461;
+}
+
+a:active {
+  color: #133e3c;
+}
+
+a:visited {
+  color: #5c8e8b;
 }
 
 @media (min-width: 768px) {
