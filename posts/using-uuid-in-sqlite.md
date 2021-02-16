@@ -6,7 +6,7 @@ SQLite does not support UUIDs by default, but with a bit of tweaking it is certa
 
 I recently had the idea to shard some data over multiple SQLite databases, but still wanted to run analytical queries across all databases. As an example, think of one database per customer, but one big offline database to figure out how many blog posts were written per user over all customers. To do that, I need to merge certain tables, which is easy enough when all databases share the same schema. However, having auto incrementing integer primary keys would lead to conflicts, because each database would have the same incrementing IDs. A bit of an annoyance.
 
-Using UUID primary keys could help, because they are unique across all databases. They take a bit more space than just integers, but this doesn't concern us now.
+Using UUID primary keys could help, because they are unique across all databases. They take a bit more space than just integers, but this doesn't concern us now, because the example is construed for demonstration purposes.
 
 ## Getting started (on Mac OS)
 
